@@ -1,0 +1,12 @@
+Package: cicreverse
+Type: Package
+Title: Estimating the Reverse Changes in Changes Model
+Version: 0.1.0
+Author: Brice Green
+Maintainer: Brice Green <brice.c.green@gmail.com>
+Description: Estimates the reverse changes-in-changes model to 
+  construct counterfactual treatments and classify outcomes given 
+  imputed treatments.
+License: Apache License (>= 2)
+Encoding: UTF-8
+LazyData: true
