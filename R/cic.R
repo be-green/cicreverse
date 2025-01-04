@@ -12,23 +12,6 @@
 # 3. then we need the inversion logic for constructing the cf
 # 4. finally we need a classifier that can map the cdfs to outcomes
 
-#' Returns smallest x
-min_or_zero = function(x) {
-  if(is.null(x) | length(x) == 0) {
-    0
-  } else {
-    min(x)
-  }
-}
-
-max_or_zero = function(x) {
-  if(is.null(x) | length(x) == 0) {
-    0
-  } else {
-    max(x)
-  }
-}
-
 #' Takes in three vectors and computes the CIC model for the
 #' initial one
 #' @param y_01 vector of outcomes for group 1 at time 0
