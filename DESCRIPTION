@@ -10,3 +10,13 @@ Description: Estimates the reverse changes-in-changes model to
 License: Apache License (>= 2)
 Encoding: UTF-8
 LazyData: true
+Imports: 
+    data.table,
+    future,
+    future.apply,
+    progressr,
+    stats
+RoxygenNote: 7.1.2
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
