@@ -29,7 +29,11 @@ cic_from_wecdfs = function(F_01, F_00, F_10) {
   subset_ids = which(y_10 < max(y_01) & y_10 > min(y_01))
   cdf_cf_11 = F_10(quantile(F_00, F_01(y_10)))
   q = seq(0, 1, by = 0.01)
-  y_11_N = stepfun(c(cdf_cf_11), c(y_10, max(y_10)), right = TRUE)(q)
+  if(length(cdf_cf_11) > 1) {
+    y_11_N = stepfun(c(cdf_cf_11), c(y_10, max(y_10)), right = TRUE)(q)
+  } else {
+    y_11_N = NULL
+  }
 
   k_cic = quantile(F_01, F_00(y_10))
   structure(
@@ -336,57 +340,57 @@ cic_from_cicdata = function(cic_data, n_boots) {
           # untreated group before the promotion year
           f00_idx = cf_data_it[s == ss & j == jj & f == "00"]
 
-          if(nrow(f00_idx) != 1 | nrow(f01_idx) != 1) {
-            browser()
-          }
+          if(nrow(f00_idx) == 1 & nrow(f01_idx) == 1) {
 
-          f01 = get_cdf(cic_data$cdfs,
-                        f01_idx$j,
-                        f01_idx$s)
+            f01 = get_cdf(cic_data$cdfs,
+                          f01_idx$j,
+                          f01_idx$s)
 
-          f00 = get_cdf(cic_data$cdfs,
-                        f00_idx$j,
-                        f00_idx$s)
+            f00 = get_cdf(cic_data$cdfs,
+                          f00_idx$j,
+                          f00_idx$s)
 
-          cl = cic_from_wecdfs(f01, f00, f10)
+            cl = cic_from_wecdfs(f01, f00, f10)
 
-          y_11 = get_x(f11)
+            y_11 = get_x(f11)
 
-          q = seq(0, 1, by = 0.01)
-          y_11_I = quantile(y_11, q)
-          cl_dt = data.table(q = q,
+            q = seq(0, 1, by = 0.01)
+            y_11_I = quantile(y_11, q)
+            cl_dt = data.table(q = q,
+                               x_11_I = y_11_I,
+                               x_11_N = cl$y_11_N,
+                               i = ii,
+                               t = tt,
+                               s = ss,
+                               j = jj)
+            il[[list_index]] = list(
+              source_data = cl,
+              table_summary = cl_dt
+            )
+
+            boot_dt = list()
+            if(n_boots > 0) {
+              for(b in 1:n_boots) {
+                f00_b = randweight_cdf(f00)
+                f01_b = randweight_cdf(f01)
+                f10_b = randweight_cdf(f10)
+                cl_b = cic_from_wecdfs(f01, f00, f10)
+                boot_dt[[b]] =
+                  data.table(q = q,
                              x_11_I = y_11_I,
                              x_11_N = cl$y_11_N,
                              i = ii,
                              t = tt,
                              s = ss,
-                             j = jj)
-          il[[list_index]] = list(
-            source_data = cl,
-            table_summary = cl_dt
-          )
-
-          boot_dt = list()
-          if(n_boots > 0) {
-            for(b in 1:n_boots) {
-              f00_b = randweight_cdf(f00)
-              f01_b = randweight_cdf(f01)
-              f10_b = randweight_cdf(f10)
-              cl_b = cic_from_wecdfs(f01, f00, f10)
-              boot_dt[[b]] =
-                data.table(q = q,
-                           x_11_I = y_11_I,
-                           x_11_N = cl$y_11_N,
-                           i = ii,
-                           t = tt,
-                           s = ss,
-                           j = jj,
-                           b = b)
+                             j = jj,
+                             b = b)
+              }
+              boot_dt = rbindlist(boot_dt)
+              il[[list_index]]$bootstraps = boot_dt
             }
-            boot_dt = rbindlist(boot_dt)
-            il[[list_index]]$bootstraps = boot_dt
+            list_index = list_index + 1
+
           }
-          list_index = list_index + 1
         }
       }
     }
