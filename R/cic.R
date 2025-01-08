@@ -374,7 +374,7 @@ cic_from_cicdata = function(cic_data, n_boots) {
                 f00_b = randweight_cdf(f00)
                 f01_b = randweight_cdf(f01)
                 f10_b = randweight_cdf(f10)
-                cl_b = cic_from_wecdfs(f01, f00, f10)
+                cl_b = cic_from_wecdfs(f01_b, f00_b, f10_b)
                 boot_dt[[b]] =
                   data.table(q = q,
                              x_11_I = y_11_I,
@@ -402,9 +402,7 @@ cic_from_cicdata = function(cic_data, n_boots) {
   tbls = lapply(l, \(x) x$table_summary) %>%
     data.table::rbindlist(., fill = T)
 
-
   source_list = lapply(l, \(x) x$source_data)
-
 
   if(n_boots > 0) {
 
