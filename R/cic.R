@@ -27,7 +27,10 @@ cic_from_wecdfs = function(F_01, F_00, F_10) {
   y_10 = get_x(F_10)
   y_10 = y_10[y_10 < max(y_01) & y_10 > min(y_01)]
   subset_ids = which(y_10 < max(y_01) & y_10 > min(y_01))
-  cdf_11 = F_10(quantile(F_00, F_01(y_10)))
+  cdf_cf_11 = F_10(quantile(F_00, F_01(y_10)))
+  q = seq(0, 1, by = 0.01)
+  y_11_N = stepfun(c(cdf_cf_11), c(y_10, max(y_10)), right = TRUE)(q)
+
   k_cic = quantile(F_01, F_00(y_10))
   structure(
     list(
@@ -35,7 +38,8 @@ cic_from_wecdfs = function(F_01, F_00, F_10) {
         F_01 = F_01, F_00 = F_00, F_10 = F_10
       ),
       y_10 = y_10,
-      cf_cdf = cdf_11,
+      y_11_N = y_11_N,
+      cf_cdf = cdf_cf_11,
       k_cic = k_cic,
       subset_ids = subset_ids
     ),
@@ -346,12 +350,13 @@ cic_from_cicdata = function(cic_data, n_boots) {
 
           cl = cic_from_wecdfs(f01, f00, f10)
 
-
           y_11 = get_x(f11)
 
-          cl_dt = data.table(x_10 = cl$y_10,
-                             x_11 = y_11[cl$subset_ids],
-                             k_cic = cl$k_cic,
+          q = seq(0, 1, by = 0.01)
+          y_11_I = quantile(y_11, q)
+          cl_dt = data.table(q = q,
+                             x_11_I = y_11_I,
+                             x_11_N = cl$y_11_N,
                              i = ii,
                              t = tt,
                              s = ss,
