@@ -385,7 +385,7 @@ cic_from_cicdata = function(cic_data, n_boots) {
                              j = jj,
                              b = b)
               }
-              boot_dt = rbindlist(boot_dt)
+              boot_dt = data.table::rbindlist(boot_dt, fill = T)
               il[[list_index]]$bootstraps = boot_dt
             }
             list_index = list_index + 1
@@ -400,7 +400,7 @@ cic_from_cicdata = function(cic_data, n_boots) {
   l = unlist(l, recursive = F)
 
   tbls = lapply(l, \(x) x$table_summary) %>%
-    rbindlist()
+    data.table::rbindlist(., fill = T)
 
 
   source_list = lapply(l, \(x) x$source_data)
@@ -409,7 +409,7 @@ cic_from_cicdata = function(cic_data, n_boots) {
   if(n_boots > 0) {
 
     bootstraps = lapply(l, \(x) x$bootstraps) %>%
-      rbindlist()
+      data.table::rbindlist(., fill = T)
 
     structure(
       list(
